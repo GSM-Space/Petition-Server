@@ -16,7 +16,7 @@ if len(sys.argv) >= 2:
         PORT = sys.argv[-1][5:]
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", port = PORT, reload = reload)
+    uvicorn.run("main:server", port = PORT, reload = reload)
 
 
 
