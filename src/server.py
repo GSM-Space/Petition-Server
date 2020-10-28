@@ -1,7 +1,7 @@
 import uvicorn
 import sys
 
-from app import app
+from app.app import app
 from configparser import ConfigParser
 
 config = ConfigParser()
