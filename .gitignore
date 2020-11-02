@@ -1,1 +1,6 @@
+# python cache 
 *.pyc
+*/__pycache__
+
+# config
+config.ini
