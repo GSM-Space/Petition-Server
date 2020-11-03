@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
+
+
 class Total_Petition(BaseModel):
     """
     총 청원에 관한 모델
@@ -9,12 +11,12 @@ class Total_Petition(BaseModel):
     ongoing_Petitiond은 진행중인 청원
     pending_Petition은 답변 대기중인 청원
     """
-    Petition : List[Petition] = []
-    expiration_Petition : List[Petition] = []
-    answered_Petition : List[Petition] = []
-    ongoing_Petition : List[Petition] = []
-    pending_Petition : List[Petition] = []
-    
+
+    Petition: List[Petition] = []
+    expiration_Petition: List[Petition] = []
+    answered_Petition: List[Petition] = []
+    ongoing_Petition: List[Petition] = []
+    pending_Petition: List[Petition] = []
 
 
 class Petition(BaseModel):
@@ -25,11 +27,8 @@ class Petition(BaseModel):
     consent는 동의 수, 참여자 수
     """
 
-    title : str
-    content : str
-    solution : str
-    consent : int
-    created_At : datetime = datetime.now()
-
-
-    
+    title: str
+    content: str
+    solution: str
+    consent: int
+    created_At: datetime = datetime.now()
