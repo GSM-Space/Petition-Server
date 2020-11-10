@@ -1,8 +1,13 @@
 from fastapi import FastAPI
 
+from routers import test
+
 app = FastAPI()
 
 
-@app.get("/test")
-async def test():
-    return {"test": "FOO"}
+app.include_router(
+    test.router,
+    prefix="/api",
+    tags=["api"],
+    responses={404: {"description" : "Not found"}},
+)
