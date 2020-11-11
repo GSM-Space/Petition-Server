@@ -165,3 +165,5 @@ pip-selfcheck.json
 ### vscode ###
 
 # End of https://www.toptal.com/developers/gitignore/api/code,vscode,python,virtualenv
+
+config.ini
