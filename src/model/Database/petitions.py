@@ -20,9 +20,9 @@ class Petitions(Base):
 
     petition_id = Column(Integer, primary_key=True)
     petitioner = Column(Integer, ForeignKey("students.std_id"))
-    title = Column(Text)
-    contents = Column(Text)
-    proposal = Column(Text)
+    title = Column(Text, nullable=False)
+    contents = Column(Text, nullable=False)
+    proposal = Column(Text, nullable=False)
     created_at = Column(DateTime(), default=datetime.now(timezone("Asia/Seoul")))
     end_at = Column(
         DateTime(), default=datetime.now(timezone("Asia/Seoul")) + timedelta(days=30)
