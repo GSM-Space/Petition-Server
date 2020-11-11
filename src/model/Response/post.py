@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import List
 
+
 class Petition(BaseModel):
     """
     title은 제목
@@ -26,11 +27,12 @@ class Total_Petition(BaseModel):
     ongoing_Petitiond은 진행중인 청원
     pending_Petition은 답변 대기중인 청원
     """
+
     Petition: List[Petition] = None
     expiration_Petition: List[Petition] = None
     answered_Petition: List[Petition] = None
     ongoing_Petition: List[Petition] = None
     pending_Petition: List[Petition] = None
 
-
-
+    class Config:
+        arbitrary_types_allowed = True
