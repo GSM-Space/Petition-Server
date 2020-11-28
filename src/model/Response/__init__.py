@@ -1,2 +1,2 @@
-from .post import Total_Petition, Petition
+from .petition import Total_Petition, Petition
 from .user import Account
