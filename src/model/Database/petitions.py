@@ -8,6 +8,13 @@ from .base import Base
 
 
 class PetitionStatus(enum.Enum):
+    """
+    ongoing : 진행중인 청원
+    pending : 답변 대기중인 청원
+    answered : 답변 된 청원
+    expired : 기한이 지난 청원
+    deleted : 삭제 된 청원
+    """
     ongoing = 1
     pending = 2
     answered = 3
