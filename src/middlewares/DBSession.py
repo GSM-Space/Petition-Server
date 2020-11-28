@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from fastapi_sqlalchemy import DBSessionMiddleware
-from model import Base, Students
+from model import Base
 
 
 class DBSession(DBSessionMiddleware):
