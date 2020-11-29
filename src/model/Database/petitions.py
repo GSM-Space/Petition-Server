@@ -18,7 +18,7 @@ class PetitionStatus(enum.Enum):
 class Petitions(Base):
     __tablename__ = "petitions"
 
-    petition_id = Column(Integer, primary_key=True)
+    petition_id = Column(Integer, primary_key=True, autoincrement=True)
     petitioner = Column(Integer, ForeignKey("students.std_id"))
     title = Column(Text, nullable=False)
     contents = Column(Text, nullable=False)
