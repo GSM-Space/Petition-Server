@@ -9,7 +9,7 @@ from .base import Base
 class Students(Base):
     __tablename__ = "students"
 
-    std_id = Column(Integer, primary_key=True)
+    std_id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String(255), nullable=False)
     password = Column(Text, nullable=False)
     std_grade = Column(Integer, nullable=False)
