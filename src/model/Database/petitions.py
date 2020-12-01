@@ -1,5 +1,5 @@
 from sqlalchemy import Table, Column, Integer, DateTime, Text, Enum, ForeignKey
-from sqlalchemy.orm import relationship, Session
+from sqlalchemy.orm import relationship
 
 from fastapi_sqlalchemy import db
 
