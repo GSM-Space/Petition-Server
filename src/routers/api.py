@@ -1,5 +1,3 @@
-from sqlalchemy.orm import Session
-
 from fastapi import APIRouter, Depends
 from model.Response.petition import CreatePetition
 from model.Database.petitions import create_petition as new_petition
