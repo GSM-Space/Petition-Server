@@ -8,7 +8,7 @@ router = APIRouter()
 def test():
     return "petition"
 
-@router.post("/create/petition")
+@router.post("/petition")
 def create_petition(req_form : CreatePetition):
     #TODO 사용자의 입력값 검증
     return new_petition(req_form)
