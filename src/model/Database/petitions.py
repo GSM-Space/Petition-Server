@@ -9,7 +9,7 @@ from pytz import timezone
 import enum
 
 from model.Database import Base
-from model import Response
+from model import Schema
 
 class PetitionStatus(enum.Enum):
     """
@@ -48,7 +48,7 @@ class Petitions(Base):
         self.proposal = proposal
         self.petitioner = petitioner
 
-def create_petition(data : Response.CreatePetition):
+def create_petition(data : Schema.CreatePetition):
     db_petition = Petitions(title = data.title,
                             contents = data.contents,
                             proposal = data.proposal,
