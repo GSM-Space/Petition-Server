@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
-from model.Schema.petition import CreatePetition
-from model.Database.petitions import create_petition as new_petition
+from fastapi import APIRouter
+
+from .petitions import petitions
+from .admin import admin
 
 router = APIRouter()
 
@@ -8,7 +9,16 @@ router = APIRouter()
 def test():
     return "petition"
 
-@router.post("/petitions")
-def create_petition(req_form : CreatePetition):
-    #TODO 사용자의 입력값 검증
-    return new_petition(req_form)
+
+router.include_router(
+    petitions,
+    prefix="/petitions",
+    tags=["api", "petitions"],
+    responses={404: {"description": "Not found"}},
+)
+router.include_router(
+    admin,
+    prefix="/admin",
+    tags=["api", "admin"],
+    responses={404: {"description": "Not found"}},
+)
