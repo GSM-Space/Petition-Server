@@ -57,4 +57,5 @@ def create_petition(data : Schema.CreatePetition):
     con.add(db_petition)
     con.commit()
     con.refresh(db_petition)
-    return db_petition
+    return { "id" : db_petition.petition_id }
+
