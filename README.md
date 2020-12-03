@@ -14,7 +14,4 @@ pip install -r requirements.txt
     ```
 3. 실행을 해준다.
     - python src/run_server.py -R(Reload option) -P (Port number)
-        - 이때 -R이나 -P는 옵션이니 안넣어줘도 된다.
-
-
-    
+        - 이때 -R이나 -P는 옵션이니 안넣어줘도 된다.    
