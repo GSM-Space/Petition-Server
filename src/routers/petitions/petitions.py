@@ -1,13 +1,17 @@
 from fastapi import APIRouter
 
 from model.Schema.petition import CreatePetition, ViewPetition
+
+from model.Database.petitions import counting_petition
 from model.Database.petitions import create_petition as new_petition
 
 petitions = APIRouter()
 
 @petitions.get("/count")
 def count_petition():
-    return "count"
+    # result = count_petition()
+    # print(result)
+    return counting_petition()
 
 @petitions.get("")
 def list_petitions(status : str = "ongoing", page : int = 1):

@@ -58,3 +58,14 @@ def create_petition(data : Schema.CreatePetition):
     con.commit()
     con.refresh(db_petition)
     return db_petition
+
+def counting_petition():
+    con = db.session
+
+    total = con.query(Petitions).count()
+    answered = con.query(Petitions).filter(Petitions.status == "answered").count()
+    pending = con.query(Petitions).filter(Petitions.status == "pending").count()
+    
+    return { "total" : total,
+             "answered" : answered,
+             "pending" : pending }
