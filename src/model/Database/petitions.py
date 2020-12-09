@@ -1,15 +1,11 @@
 from sqlalchemy import Table, Column, Integer, DateTime, Text, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 
-from fastapi_sqlalchemy import db
-
-
 from datetime import datetime, timedelta
 from pytz import timezone
 import enum
 
 from model.Database import Base
-from model import Schema
 
 class PetitionStatus(enum.Enum):
     """

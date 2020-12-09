@@ -1,6 +1,9 @@
+from fastapi_sqlalchemy import db
 
+from model import Schema
+from model.Database.petitions import Petitions
 
-def create_petition(data : Schema.CreatePetition):
+def new_petition(data : Schema.CreatePetition):
     db_petition = Petitions(title = data.title,
                             contents = data.contents,
                             proposal = data.proposal,

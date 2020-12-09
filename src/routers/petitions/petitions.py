@@ -2,8 +2,8 @@ from fastapi import APIRouter
 
 from model.Schema.petition import CreatePetition, ViewPetition
 
-from model.Database.petitions import counting_petition
-from model.Database.petitions import create_petition as new_petition
+from controller.petitions_controller import counting_petition, new_petition
+
 
 petitions = APIRouter()
 
