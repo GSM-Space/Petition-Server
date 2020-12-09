@@ -9,8 +9,6 @@ petitions = APIRouter()
 
 @petitions.get("/count")
 def count_petition():
-    # result = count_petition()
-    # print(result)
     return counting_petition()
 
 @petitions.get("")
@@ -49,4 +47,3 @@ def agree_petition(id : int):
     #TODO 사용자 권한 인증
     # 200 -> 성공, 400 -> 이미 동의한 청원, 404 -> 존재하지 않는 청원
     return "agree"
-
