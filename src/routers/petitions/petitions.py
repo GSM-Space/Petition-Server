@@ -1,13 +1,15 @@
 from fastapi import APIRouter
 
 from model.Schema.petition import CreatePetition, ViewPetition
-from model.Database.petitions import create_petition as new_petition
+
+from controller.petitions import counting_petition, new_petition
+
 
 petitions = APIRouter()
 
 @petitions.get("/count")
 def count_petition():
-    return "count"
+    return counting_petition()
 
 @petitions.get("")
 def list_petitions(status : str = "ongoing", page : int = 1):
@@ -45,4 +47,3 @@ def agree_petition(id : int):
     #TODO 사용자 권한 인증
     # 200 -> 성공, 400 -> 이미 동의한 청원, 404 -> 존재하지 않는 청원
     return "agree"
-

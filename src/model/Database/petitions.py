@@ -1,15 +1,11 @@
 from sqlalchemy import Table, Column, Integer, DateTime, Text, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 
-from fastapi_sqlalchemy import db
-
-
 from datetime import datetime, timedelta
 from pytz import timezone
 import enum
 
 from model.Database import Base
-from model import Schema
 
 class PetitionStatus(enum.Enum):
     """
@@ -47,15 +43,3 @@ class Petitions(Base):
         self.contents = contents
         self.proposal = proposal
         self.petitioner = petitioner
-
-def create_petition(data : Schema.CreatePetition):
-    db_petition = Petitions(title = data.title,
-                            contents = data.contents,
-                            proposal = data.proposal,
-                            petitioner = str(data.petitioner))
-    con = db.session
-    con.add(db_petition)
-    con.commit()
-    con.refresh(db_petition)
-    return { "id" : db_petition.petition_id }
-
