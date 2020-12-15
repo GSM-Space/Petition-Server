@@ -11,19 +11,13 @@ class Students(Base):
 
     std_id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String(255), nullable=False)
-    password = Column(Text, nullable=False)
-    std_grade = Column(Integer, nullable=False)
-    std_class = Column(Integer, nullable=False)
-    std_number = Column(Integer, nullable=False)
     name = Column(String(45), nullable=False)
     my_petitions = relationship("Petitions", backref="students")
     agreed = relationship("Petitions", backref="agreements")
 
-    def __init__(self, email, password, std_grade, std_class, std_number, name):
+    def __init__(self, email, password, name):
         self.email = email
         self.password = self.hash_password(password)
-        self.std_grade = std_grade
-        self.std_class = std_class
         self.std_number = std_number
         self.name = name
 
