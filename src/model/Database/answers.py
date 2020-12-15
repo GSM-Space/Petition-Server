@@ -1,4 +1,6 @@
 from sqlalchemy import Table, Column, Integer, Text, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+
 from datetime import datetime
 from pytz import timezone
 
@@ -12,6 +14,7 @@ class Answers(Base):
     contents = Column(Text, nullable=False)
     created_at = Column(DateTime(), default=datetime.now(timezone("Asia/Seoul")))
 
+    petition = relationship("Petitions", back_populates="answer")
     def __init__(self, petition_id, contents):
         self.petition_id = petition_id
         self.contents = contents
