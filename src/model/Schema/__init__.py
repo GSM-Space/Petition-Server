@@ -1,2 +1,2 @@
-from .petition import Petition, CreatePetition, ListPetitions, ViewPetition
+from .petition import Petition, PetitionResponse
 from .user import Account
