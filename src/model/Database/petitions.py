@@ -36,7 +36,7 @@ class Petitions(Base):
     )
     status = Column(Enum(PetitionStatus), default=PetitionStatus.ongoing)
 
-    petitioners = relationship("Studets", back_populates="my_petitions")
+    petitioners = relationship("Students", back_populates="my_petitions")
     agreed = relationship("Agreements", back_populates="petition")
     answer = relationship("Answers", back_populates="petition")
     consent_student = relationship("Students", back_populates="agreed")
