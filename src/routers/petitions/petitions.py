@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Response, status
+from typing import List
 
-from model.Schema.petition import CreatePetition, ViewPetition
+from model.Schema.petition import Petition, PetitionResponse
 
 from controller.petitions import counting_petition, new_petition, consent_petition
 
@@ -8,12 +9,12 @@ from controller.petitions import counting_petition, new_petition, consent_petiti
 petitions = APIRouter()
 
 
-@petitions.get("/count")
+@petitions.get("/count", response_model=PetitionResponse.Count)
 def count_petition():
     return counting_petition()
 
 
-@petitions.get("")
+@petitions.get("", response_model=PetitionResponse.List)
 def list_petitions(status: str = "ongoing", page: int = 1):
     # TODO 사용자 입력값 검증
     # TODO 청원 목록 불러오기 구현
@@ -22,20 +23,20 @@ def list_petitions(status: str = "ongoing", page: int = 1):
     return "list"
 
 
-@petitions.get("/search")
+@petitions.get("/search", response_model=PetitionResponse.List)
 def search_petitons(q: str, page: int = 1):
     # TODO 청원 검색 기능 구현
     # TODO 사용자 입력값 검증
     return "search"
 
 
-@petitions.post("")
-def create_petition(req_form: CreatePetition):
+@petitions.post("", response_model=PetitionResponse.Id)
+def create_petition(req_form: Petition.Create):
     # TODO 사용자의 입력값 검증
     return new_petition(req_form)
 
 
-@petitions.get("/{id}", response_model=ViewPetition)
+@petitions.get("/{id}", response_model=Petition.View)
 def load_petition(id: int):
     # TODO 200은 성공적 반환, 값이 없을 경우 404 반환
     return "load"
