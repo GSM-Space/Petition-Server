@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, Response
+from fastapi import status as res_status
 
 from model.Schema.petition import CreatePetition, ViewPetition
 
-from controller.petitions import counting_petition, new_petition, consent_petition
+from controller.petitions import counting_petition, new_petition, consent_petition, get_petition_list
 
 
 petitions = APIRouter()
@@ -11,13 +12,13 @@ petitions = APIRouter()
 def count_petition():
     return counting_petition()
 
-@petitions.get("")
-def list_petitions(status : str = "ongoing", page : int = 1):
-    #TODO 사용자 입력값 검증
-    #TODO 청원 목록 불러오기 구현
-    #TODO status를 잘못 입력시 400 return
+@petitions.get("", status_code=200)
+def list_petitions(response : Response, status : str = "ongoing", page : int = 1):
+    if not status in ["ongoing", "pending", "answered", "expired", "deleted"]:
+        response.status_code = res_status.HTTP_400_BAD_REQUEST
+        return { "description" : "Invalid status value" }
 
-    return "list"
+    return get_petition_list(status = status, page = page)
 
 @petitions.get("/search")
 def search_petitons(q : str, page : int = 1):
@@ -48,10 +49,10 @@ def agree_petition(id : int, response : Response):
     # 200 -> 성공, 400 -> 이미 동의한 청원, 404 -> 존재하지 않는 청원
     result = consent_petition(id)
     if result == 200:
-        response.status_code =  status.HTTP_200_OK
+        response.status_code =  res_status.HTTP_200_OK
     elif result == 400:
-        response.status_code = status.HTTP_400_BAD_REQUEST
+        response.status_code = res_status.HTTP_400_BAD_REQUEST
     elif result == 404:
-        response.status_code = status.HTTP_404_NOT_FOUND
+        response.status_code = res_status.HTTP_404_NOT_FOUND
         
     return "dtd"

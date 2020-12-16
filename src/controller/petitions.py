@@ -37,4 +37,13 @@ def consent_petition(id : int):
         return 400
     return 404
 
+def get_petition_list(status : str, page : int):
+    
+    con = db.session
 
+    petition_list = con.query(
+                        Petitions).filter(Petitions.status == status).all()
+    max_page = len(petition_list) // 5 + 1
+    return {"petitions" : petition_list, "max_page" : max_page }
+
+    
