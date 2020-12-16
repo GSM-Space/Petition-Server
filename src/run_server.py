@@ -14,7 +14,7 @@ def main(argv: list() = sys.argv):
     config.read("../config.ini")
 
     FILE_NAME = argv[0]
-    reload  : str = "False"
+    reload: str = "False"
     try:
         PORT: int = int(config.get("default", "PORT"))
     except Exception as e:
@@ -33,10 +33,10 @@ def main(argv: list() = sys.argv):
             print(FILE_NAME, "-R -P <Port Number>")
             sys.exit(2)
         elif opt in ("-R", "--reload"):
-            reload : str = "True"
+            reload: str = "True"
             # "reload setting option : -R, --reload"
         elif opt in ("-P", "--PORT"):
-            PORT : int = int(arg)
+            PORT: int = int(arg)
             # "PORT setting option : -P args, --PORT=args"
     uvicorn.run("app:app", port=PORT, reload=reload)
 

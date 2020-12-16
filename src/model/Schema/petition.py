@@ -1,30 +1,45 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
-class Petition(BaseModel):
 
-    title : str
+class Petition:
+    class Base(BaseModel):
+        title: str
 
-class CreatePetition(Petition):
+    class Create(Base):
+        petitioner: int
+        contents: str
+        proposal: str
 
-    petitioner : int
-    contents: str
-    proposal : str
+        class Config:
+            orm_mode = True
 
-    class Config:
-        orm_mode = True
+    class Preview(Base):
+        id: Optional[int]
+        status: int
+        agreed: int
+        end_at: datetime
 
-class ListPetitions(Petition):
+    class View(Preview):
+        created_at: datetime
+        contents: str
+        proposal: str
+        agreeable: Optional[bool]
+        answer: Optional[str]
+        answered_at: Optional[datetime]
+        answered_by: Optional[str]
 
-    end_at : datetime
-    title : str
-    agreed : int
-    status : int
 
-class ViewPetition(ListPetitions):
+class PetitionResponse:
+    class Id(BaseModel):
+        id: int
 
-    contents : str
-    proposal : str
-    created_at : datetime
-    answer : str
+    class Count(BaseModel):
+        total: int
+        answered: int
+        pending: int
+
+    class List(BaseModel):
+        petitions: List[Petition.Preview]
+        max_page: int
