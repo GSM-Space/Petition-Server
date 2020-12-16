@@ -31,7 +31,9 @@ def search_petitons(q: str, page: int = 1):
 
 
 @petitions.post("", response_model=PetitionResponse.Id)
-def create_petition(req_form: Petition.Create):
+def create_petition(
+  req_form: Petition.Create, authorization: Optional[str] = Header(None)
+):
     # TODO 사용자의 입력값 검증
     return new_petition(req_form)
 
@@ -43,7 +45,7 @@ def load_petition(id: int):
 
 
 @petitions.delete("/{id}")
-def delete_petition(id: int):
+def delete_petition(id: int, authorization: Optional[str] = Header(None)):
     # TODO 사용자 권한 인증
     # 청원 삭제 기능 구현
     # 204 -> 이미 삭제 된 청원, 403 -> 삭제 권한 없음, 404 -> 없는 청원
@@ -51,7 +53,9 @@ def delete_petition(id: int):
 
 
 @petitions.post("/{id}")
-def agree_petition(id: int, response: Response):
+def agree_petition(
+    id: int, response: Response, authorization: Optional[str] = Header(None)
+):
     # TODO 사용자 권한 인증
     # 200 -> 성공, 400 -> 이미 동의한 청원, 404 -> 존재하지 않는 청원
     result = consent_petition(id)
