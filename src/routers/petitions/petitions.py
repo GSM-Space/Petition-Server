@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Response, status
 from typing import List
 
-from model.Schema.petition import Petition, PetitionResponse
+from model.Schema import Petition, PetitionResponse
 
 from controller.petitions import counting_petition, new_petition, consent_petition
 
