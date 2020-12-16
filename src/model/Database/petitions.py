@@ -35,8 +35,11 @@ class Petitions(Base):
         DateTime(), default=datetime.now(timezone("Asia/Seoul")) + timedelta(days=30)
     )
     status = Column(Enum(PetitionStatus), default=PetitionStatus.ongoing)
+
+    petitioners = relationship("Studets", back_populates="my_petitions")
     agreed = relationship("Agreements", back_populates="petition")
     answer = relationship("Answers", back_populates="petition")
+    consent_student = relationship("Students", back_populates="agreed")
 
     def __init__(self, title, contents, proposal, petitioner):
         self.title = title
