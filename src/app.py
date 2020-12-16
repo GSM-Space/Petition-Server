@@ -13,6 +13,5 @@ app.add_middleware(DBSession, db_url=config.get("default", "DB_URL"))
 app.include_router(
     api.router,
     prefix="/api",
-    tags=["api"],
     responses={404: {"description": "Not found"}},
 )
