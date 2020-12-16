@@ -1,11 +1,11 @@
 from fastapi_sqlalchemy import db
 
-from model import Schema
+from model.Schema import Petition
 from model.Database.petitions import Petitions
 from model.Database.agreements import Agreements
 
 
-def new_petition(data: Schema.CreatePetition):
+def new_petition(data: Petition.Create):
     db_petition = Petitions(
         title=data.title,
         contents=data.contents,
