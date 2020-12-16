@@ -7,6 +7,7 @@ import enum
 
 from model.Database import Base
 
+
 class PetitionStatus(enum.Enum):
     """
     ongoing : 진행중인 청원
@@ -15,6 +16,7 @@ class PetitionStatus(enum.Enum):
     expired : 기한이 지난 청원
     deleted : 삭제 된 청원
     """
+
     ongoing = 1
     pending = 2
     answered = 3

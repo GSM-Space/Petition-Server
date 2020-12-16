@@ -12,7 +12,7 @@ class Students(Base):
     std_id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String(255), nullable=False)
     name = Column(String(45), nullable=False)
-    is_admin = Column(Boolean, default = False)
+    is_admin = Column(Boolean, default=False)
     my_petitions = relationship("Petitions", backref="petitioner")
     agreed = relationship("Petitions", backref="consent_student")
 
@@ -21,4 +21,3 @@ class Students(Base):
         self.password = self.hash_password(password)
         self.std_number = std_number
         self.name = name
-
