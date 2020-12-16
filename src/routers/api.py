@@ -5,6 +5,7 @@ from .admin import admin
 
 router = APIRouter()
 
+
 @router.post("/test")
 def test():
     return "petition"

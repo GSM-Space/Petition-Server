@@ -15,6 +15,7 @@ class Agreements(Base):
     created_at = Column(DateTime(), default=datetime.now(timezone("Asia/Seoul")))
 
     petition = relationship("Petitions", back_populates="agreed")
+
     def __init__(self, std_id, petition_id):
         self.std_id = std_id
         self.petition_id = petition_id

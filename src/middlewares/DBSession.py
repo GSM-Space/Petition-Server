@@ -3,6 +3,7 @@ from fastapi_sqlalchemy import DBSessionMiddleware
 
 from model.Database import Base
 
+
 class DBSession(DBSessionMiddleware):
     def __init__(self, db_url=None, custom_engine=None, *args, **kwargs):
         if not db_url and not custom_engine:
