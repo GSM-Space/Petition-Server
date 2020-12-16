@@ -21,6 +21,3 @@ class Students(Base):
         self.std_number = std_number
         self.name = name
 
-    def hash_password(self, password):
-        # TODO: 비밀번호 해쉬
-        return password
