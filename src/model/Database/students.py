@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, String, DateTime, Text
+from sqlalchemy import Table, Column, Integer, String, DateTime, Text, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from pytz import timezone
@@ -12,8 +12,9 @@ class Students(Base):
     std_id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String(255), nullable=False)
     name = Column(String(45), nullable=False)
-    my_petitions = relationship("Petitions", backref="students")
-    agreed = relationship("Petitions", backref="agreements")
+    is_admin = Column(Boolean, default = False)
+    my_petitions = relationship("Petitions", backref="petitioner")
+    agreed = relationship("Petitions", backref="consent_student")
 
     def __init__(self, email, password, name):
         self.email = email
