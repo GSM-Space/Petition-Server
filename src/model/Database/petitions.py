@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, DateTime, Text, Enum, ForeignKey
+from sqlalchemy import Table, Column, Integer, DateTime, Text, Enum, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 from datetime import datetime, timedelta
@@ -6,6 +6,7 @@ from pytz import timezone
 import enum
 
 from model.Database import Base
+
 
 class PetitionStatus(enum.Enum):
     """
@@ -15,6 +16,7 @@ class PetitionStatus(enum.Enum):
     expired : 기한이 지난 청원
     deleted : 삭제 된 청원
     """
+
     ongoing = 1
     pending = 2
     answered = 3
@@ -26,7 +28,7 @@ class Petitions(Base):
     __tablename__ = "petitions"
 
     petition_id = Column(Integer, primary_key=True, autoincrement=True)
-    petitioner = Column(Integer, ForeignKey("students.std_id"))
+    petitioner = Column(String(32), ForeignKey("students.std_id"))
     title = Column(Text, nullable=False)
     contents = Column(Text, nullable=False)
     proposal = Column(Text, nullable=False)
