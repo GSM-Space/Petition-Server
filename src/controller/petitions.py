@@ -1,4 +1,5 @@
 from fastapi_sqlalchemy import db
+from sqlalchemy.sql import func
 
 from model.Schema import Petition
 from model.Database.petitions import Petitions
@@ -44,7 +45,16 @@ def consent_petition(id: int):
 def get_petition_list(status: str, page: int):
 
     con = db.session
-
-    petition_list = con.query(Petitions).filter(Petitions.status == status).all()
+    petition_list = (
+        con.query(
+            Petitions.petition_id,
+            Petitions.title,
+            func.count("std_id").label("agreed"),
+            Petitions.end_at,
+        )
+        .group_by(Petitions.petition_id)
+        .all()
+    )
+    # petition_list = con.query(Petitions).filter(Petitions.status == status).all()
     max_page = len(petition_list) // 5 + 1
     return {"petitions": petition_list, "max_page": max_page}
