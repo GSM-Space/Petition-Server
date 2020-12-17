@@ -10,7 +10,7 @@ def new_petition(data: Schema.CreatePetition):
         title=data.title,
         contents=data.contents,
         proposal=data.proposal,
-        petitioner=str(data.petitioner),
+        petitioner=data.petitioner,
     )
     con = db.session
     con.add(db_petition)
