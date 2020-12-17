@@ -28,7 +28,7 @@ class Petitions(Base):
     __tablename__ = "petitions"
 
     petition_id = Column(Integer, primary_key=True, autoincrement=True)
-    petitioner = Column(String(32), ForeignKey("students.std_id"))
+    petitioner = Column(String(32), ForeignKey("users.std_id"))
     title = Column(Text, nullable=False)
     contents = Column(Text, nullable=False)
     proposal = Column(Text, nullable=False)
