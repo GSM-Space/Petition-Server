@@ -8,7 +8,7 @@ class Petition:
         title: str
 
     class Create(Base):
-        petitioner: int
+        petitioner: str
         contents: str
         proposal: str
 

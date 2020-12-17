@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, DateTime, Text, Enum, ForeignKey
+from sqlalchemy import Table, Column, Integer, DateTime, Text, Enum, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 from datetime import datetime, timedelta
@@ -28,7 +28,7 @@ class Petitions(Base):
     __tablename__ = "petitions"
 
     petition_id = Column(Integer, primary_key=True, autoincrement=True)
-    petitioner = Column(Integer, ForeignKey("students.std_id"))
+    petitioner = Column(String(32), ForeignKey("users.std_id"))
     title = Column(Text, nullable=False)
     contents = Column(Text, nullable=False)
     proposal = Column(Text, nullable=False)
@@ -37,11 +37,8 @@ class Petitions(Base):
         DateTime(), default=datetime.now(timezone("Asia/Seoul")) + timedelta(days=30)
     )
     status = Column(Enum(PetitionStatus), default=PetitionStatus.ongoing)
-
-    petitioners = relationship("Students", back_populates="my_petitions")
     agreed = relationship("Agreements", back_populates="petition")
     answer = relationship("Answers", back_populates="petition")
-    consent_student = relationship("Students", back_populates="agreed")
 
     def __init__(self, title, contents, proposal, petitioner):
         self.title = title
