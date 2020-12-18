@@ -50,7 +50,7 @@ def get_petition_list(status: str, page: int):
         con.query(
             Petitions.petition_id.label("petition_id"),
             Petitions.title.label("title"),
-            func.count("std_id").label("agreed"),
+            func.count("agreed").label("agreed"),
             Petitions.end_at.label("end_at"),
         )
         .filter(Petitions.status == status)
@@ -61,5 +61,5 @@ def get_petition_list(status: str, page: int):
     petition_list = [
         {key: value for (key, value) in zip(label, row)} for row in get_list
     ]
-    max_page = len(petition_list) // 5 + 1
+    max_page = (len(petition_list) - 1) // 5 + 1
     return {"petitions": petition_list, "max_page": max_page}
