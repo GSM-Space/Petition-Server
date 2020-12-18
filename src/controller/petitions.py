@@ -45,16 +45,21 @@ def consent_petition(id: int):
 def get_petition_list(status: str, page: int):
 
     con = db.session
-    petition_list = (
+    # [{key: value for (key, value) in row.items()} for row in rows]
+    get_list = (
         con.query(
-            Petitions.petition_id,
-            Petitions.title,
+            Petitions.petition_id.label("petition_id"),
+            Petitions.title.label("title"),
             func.count("std_id").label("agreed"),
-            Petitions.end_at,
+            Petitions.end_at.label("end_at"),
         )
+        .filter(Petitions.status == status)
         .group_by(Petitions.petition_id)
         .all()
     )
-    # petition_list = con.query(Petitions).filter(Petitions.status == status).all()
+    label = ["petiton_id", "title", "agreed", "end_at"]
+    petition_list = [
+        {key: value for (key, value) in zip(label, row)} for row in get_list
+    ]
     max_page = len(petition_list) // 5 + 1
     return {"petitions": petition_list, "max_page": max_page}
