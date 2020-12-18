@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from model.Schema import Petition, PetitionResponse
 
-from controller.petitions import counting_petition, new_petition, consent_petition
+from controller.petitions import PetitionController
 
 
 petitions = APIRouter()
@@ -11,7 +11,7 @@ petitions = APIRouter()
 
 @petitions.get("/count", response_model=PetitionResponse.Count)
 def count_petition():
-    return counting_petition()
+    return PetitionController.count_petitions()
 
 
 @petitions.get("", response_model=PetitionResponse.List)
@@ -32,10 +32,10 @@ def search_petitons(q: str, page: int = 1):
 
 @petitions.post("", response_model=PetitionResponse.Id)
 def create_petition(
-  req_form: Petition.Create, authorization: Optional[str] = Header(None)
+    req_form: Petition.Create, authorization: Optional[str] = Header(None)
 ):
     # TODO 사용자의 입력값 검증
-    return new_petition(req_form)
+    return PetitionController(**req_form.dict()).create()
 
 
 @petitions.get("/{id}", response_model=Petition.View)
@@ -58,7 +58,8 @@ def agree_petition(
 ):
     # TODO 사용자 권한 인증
     # 200 -> 성공, 400 -> 이미 동의한 청원, 404 -> 존재하지 않는 청원
-    result = consent_petition(id)
+    result = PetitionController(id=id).consent()
+
     if result == 200:
         response.status_code = status.HTTP_200_OK
     elif result == 400:
