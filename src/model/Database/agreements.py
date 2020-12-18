@@ -11,7 +11,6 @@ class Agreements(Base):
     __tablename__ = "agreements"
 
     std_id = Column(String(32), ForeignKey("users.std_id"), primary_key=True)
-
     petition_id = Column(Integer, ForeignKey("petitions.petition_id"), primary_key=True)
     created_at = Column(DateTime(), default=datetime.now(timezone("Asia/Seoul")))
 
