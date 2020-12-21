@@ -3,11 +3,11 @@ from fastapi_sqlalchemy import db
 
 from model.Database.petitions import Petitions
 from model.Database.users import Users
-from controller.auth import auth_account
+from controller.auth import auth_by_token
 
 
-def rne(id_token: str):
-    data = auth_account(id_token)
+def get_user_info(id_token: str):
+    data = auth_by_token(id_token)
     con = db.session
     try:
         check = con.query(Users).filter(Users.std_id == data["sub"]).first()
