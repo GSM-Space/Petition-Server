@@ -25,7 +25,7 @@ router.include_router(
 router.include_router(
     auth,
     prefix="/auth",
-    tags=["api", "account", "auth"],
+    tags=["auth"],
     responses={404 : {"description" : "Not found"}},
 )
 
