@@ -4,12 +4,7 @@ from typing import Optional
 
 from model.Schema import Petition, PetitionResponse
 
-from controller.petitions import (
-    counting_petition,
-    new_petition,
-    consent_petition,
-    get_petition_list,
-)
+from controller.petitions import PetitionController
 
 
 petitions = APIRouter()
@@ -17,7 +12,7 @@ petitions = APIRouter()
 
 @petitions.get("/count", response_model=PetitionResponse.Count)
 def count_petition():
-    return counting_petition()
+    return PetitionController.count_petitions()
 
 
 @petitions.get("", status_code=200)
@@ -25,7 +20,7 @@ def list_petitions(response: Response, status: str = "ongoing", page: int = 1):
     if not status in ["ongoing", "pending", "answered", "expired", "deleted"]:
         response.status_code = res_status.HTTP_400_BAD_REQUEST
         return {"description": "Invalid status value"}
-    return get_petition_list(status=status, page=page)
+    return PetitionController.get_petitions(status=status, page=page)
 
 
 @petitions.get("/search", response_model=PetitionResponse.List)
@@ -40,7 +35,7 @@ def create_petition(
     req_form: Petition.Create, authorization: Optional[str] = Header(None)
 ):
     # TODO 사용자의 입력값 검증
-    return new_petition(req_form)
+    return PetitionController(**req_form.dict()).create()
 
 
 @petitions.get("/{id}", response_model=Petition.View)
@@ -63,7 +58,8 @@ def agree_petition(
 ):
     # TODO 사용자 권한 인증
     # 200 -> 성공, 400 -> 이미 동의한 청원, 404 -> 존재하지 않는 청원
-    result = consent_petition(id)
+    result = PetitionController(id=id).consent()
+
     if result == 200:
         response.status_code = res_status.HTTP_200_OK
     elif result == 400:
