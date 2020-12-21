@@ -8,6 +8,7 @@ from .auth import auth
 
 router = APIRouter()
 
+
 @router.post("/test")
 def test():
     return "petition"
@@ -17,7 +18,7 @@ def test():
 router.include_router(
     petitions,
     prefix="/petitions",
-    tags=["api", "petitions"],
+    tags=["petitions"],
     responses={404: {"description": "Not found"}},
 )
 
@@ -31,6 +32,6 @@ router.include_router(
 router.include_router(
     admin,
     prefix="/admin",
-    tags=["api", "admin"],
+    tags=["admin"],
     responses={404: {"description": "Not found"}},
 )
