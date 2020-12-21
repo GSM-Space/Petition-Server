@@ -39,7 +39,9 @@ def search_petitons(q: str, page: int = 1):
 def create_petition(
     req_form: Petition.Create, authorization: Optional[str] = Header(None)
 ):
-    # TODO 사용자의 입력값 검증
+    # XSS, 필터의 경우 리액트에서 적용함
+    # SQLI의 경우 Test 필요
+    
     return new_petition(req_form)
 
 
