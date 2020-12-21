@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Response, status, Header
-from typing import List, Optional
+from fastapi import APIRouter, Response, Header
+from fastapi import status as res_status
+from typing import Optional
 
 from model.Schema import Petition, PetitionResponse
 
@@ -14,13 +15,12 @@ def count_petition():
     return PetitionController.count_petitions()
 
 
-@petitions.get("", response_model=PetitionResponse.List)
-def list_petitions(status: str = "ongoing", page: int = 1):
-    # TODO 사용자 입력값 검증
-    # TODO 청원 목록 불러오기 구현
-    # TODO status를 잘못 입력시 400 return
-
-    return "list"
+@petitions.get("", status_code=200)
+def list_petitions(response: Response, status: str = "ongoing", page: int = 1):
+    if not status in ["ongoing", "pending", "answered", "expired", "deleted"]:
+        response.status_code = res_status.HTTP_400_BAD_REQUEST
+        return {"description": "Invalid status value"}
+    return PetitionController.get_petitions(status=status, page=page)
 
 
 @petitions.get("/search", response_model=PetitionResponse.List)
@@ -61,10 +61,10 @@ def agree_petition(
     result = PetitionController(id=id).consent()
 
     if result == 200:
-        response.status_code = status.HTTP_200_OK
+        response.status_code = res_status.HTTP_200_OK
     elif result == 400:
-        response.status_code = status.HTTP_400_BAD_REQUEST
+        response.status_code = res_status.HTTP_400_BAD_REQUEST
     elif result == 404:
-        response.status_code = status.HTTP_404_NOT_FOUND
+        response.status_code = res_status.HTTP_404_NOT_FOUND
 
     return "dtd"

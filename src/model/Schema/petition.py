@@ -16,7 +16,7 @@ class Petition:
             orm_mode = True
 
     class Preview(Base):
-        id: Optional[int]
+        id: Optional[str]
         status: int
         agreed: int
         end_at: datetime

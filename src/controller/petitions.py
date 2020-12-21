@@ -1,5 +1,6 @@
 from fastapi_sqlalchemy import db
 from datetime import datetime
+from sqlalchemy.sql import func
 
 from model.Schema import Petition
 from model.Database import Petitions, Agreements
@@ -79,3 +80,26 @@ class PetitionController:
     @staticmethod
     def search_petitions():
         return
+
+    @staticmethod
+    def get_petitions(status: str, page: int):
+        con = db.session
+
+        get_list = (
+            con.query(
+                Petitions.petition_id.label("petition_id"),
+                Petitions.title.label("title"),
+                func.count("agreed").label("agreed"),
+                Petitions.end_at.label("end_at"),
+            )
+            .filter(Petitions.status == status)
+            .group_by(Petitions.petition_id)
+            .all()
+        )
+
+        label = ["petiton_id", "title", "agreed", "end_at"]
+        petition_list = [
+            {key: value for (key, value) in zip(label, row)} for row in get_list
+        ]
+        max_page = (len(petition_list) - 1) // 5 + 1
+        return {"petitions": petition_list, "max_page": max_page}
