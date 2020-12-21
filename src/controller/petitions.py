@@ -78,7 +78,7 @@ class PetitionController:
         return {"total": total, "answered": answered, "pending": pending}
 
     @staticmethod
-    def search_petitions():
+    def search_petitions(q: str, page: int):
         return
 
     @staticmethod
