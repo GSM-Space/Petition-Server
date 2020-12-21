@@ -12,7 +12,7 @@ def rne(id_token: str):
     try:
         check = con.query(Students).filter(Students.std_id == data["sub"]).first()
     except (KeyError):
-        return {"error": "만료된 토큰입니다.", "test": account}
+        return {"error": "만료된 토큰입니다."}
     if not check:
         account = Students(std_id=data["sub"], email=data["email"], name=data["name"])
         con.add(account)
