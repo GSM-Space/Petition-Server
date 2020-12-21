@@ -13,11 +13,15 @@ def get_user_info(id_token: str):
         check = con.query(Users).filter(Users.std_id == data["sub"]).first()
     except (KeyError):
         return {"error": "만료된 토큰입니다."}
-    if not check:
-        account = Users(std_id=data["sub"], email=data["email"], name=data["name"])
-        con.add(account)
-        con.commit()
-        con.refresh(account)
-        return {"information": {"email": data["email"], "name": data["name"]}}
+    try:
+        return {"information": {"email": check.email, "name": check.name}}
+    except (Exception e):
+        return None
+        
 
-    return {"information": {"email": check.email, "name": check.name}}
+def register_user(id_token: str):
+    account = Users(std_id=data["sub"], email=data["email"], name=data["name"])
+    con.add(account)
+    con.commit()
+    con.refresh(account)
+    return {"information": {"email": data["email"], "name": data["name"]}}
