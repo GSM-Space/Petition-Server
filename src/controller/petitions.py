@@ -38,12 +38,14 @@ class PetitionController:
         self.answered_by = answered_by
 
     def create(self):
-        db_petition = Petitions(
+        data = Petition.Create(
             title=self.title,
             contents=self.contents,
             proposal=self.proposal,
-            petitioner=str(self.petitioner),
+            petitioner=self.petitioner,
         )
+        db_petition = Petitions(**data.dict())
+
         con = db.session
         con.add(db_petition)
         con.commit()
