@@ -6,20 +6,12 @@ from model.Database.petitions import Petitions
 from model.Database.agreements import Agreements
 
 
-<<<<<<< HEAD
-def new_petition(data: Schema.CreatePetition):
-=======
 def new_petition(data: Petition.Create):
->>>>>>> daece2c005f0bd0ae012b2e81a332022d5d267f9
     db_petition = Petitions(
         title=data.title,
         contents=data.contents,
         proposal=data.proposal,
-<<<<<<< HEAD
         petitioner=data.petitioner,
-=======
-        petitioner=str(data.petitioner),
->>>>>>> daece2c005f0bd0ae012b2e81a332022d5d267f9
     )
     con = db.session
     con.add(db_petition)
