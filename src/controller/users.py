@@ -6,8 +6,7 @@ from model.Database.users import Users
 from controller.auth import auth_by_token
 
 
-def get_user_info(id_token: str):
-    data = auth_by_token(id_token)
+def get_user_info(data):
     con = db.session
     try:
         check = con.query(Users).filter(Users.std_id == data["sub"]).first()
@@ -21,7 +20,7 @@ def get_user_info(id_token: str):
         return None
 
 
-def register_user(id_token: str):
+def register_user(data):
     account = Users(std_id=data["sub"], email=data["email"], name=data["name"])
     con.add(account)
     con.commit()
