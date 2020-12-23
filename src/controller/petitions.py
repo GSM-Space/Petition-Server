@@ -119,7 +119,7 @@ class PetitionController:
             .all()
         )
 
-        label = ["petiton_id", "title", "agreed", "end_at"]
+        label = ["petition_id", "title", "agreed", "end_at"]
         petition_list = [
             {key: value for (key, value) in zip(label, row)} for row in get_list
         ]
