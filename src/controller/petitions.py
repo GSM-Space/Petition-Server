@@ -82,6 +82,7 @@ class PetitionController:
     @staticmethod
     def search_petitions(q: str, page: int):
         con = db.session
+        min_limit = (page - 1) * 5
 
         searched = (
             con.query(
@@ -93,6 +94,8 @@ class PetitionController:
             )
             .filter(Petitions.title.like(f"%{q}%"))
             .group_by(Petitions.petition_id)
+            .offset(min_limit)
+            .limit(5)
             .all()
         )
 
