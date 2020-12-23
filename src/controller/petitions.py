@@ -81,7 +81,30 @@ class PetitionController:
 
     @staticmethod
     def search_petitions(q: str, page: int):
-        return
+        con = db.session
+        min_limit = (page - 1) * 5
+
+        searched = (
+            con.query(
+                Petitions.petition_id.label("petition_id"),
+                Petitions.title.label("title"),
+                func.count("agreed").label("agreed"),
+                Petitions.end_at.label("end_at"),
+                Petitions.status.label("status"),
+            )
+            .filter(Petitions.title.like(f"%{q}%"))
+            .group_by(Petitions.petition_id)
+            .offset(min_limit)
+            .limit(5)
+            .all()
+        )
+
+        label = ["petition_id", "title", "agreed", "end_at", "status"]
+        petition_list = [
+            {key: value for (key, value) in zip(label, row)} for row in searched
+        ]
+        max_page = (len(petition_list) - 1) // 5 + 1
+        return {"petitions": petition_list, "max_page": max_page}
 
     @staticmethod
     def get_petitions(status: str, page: int):
@@ -99,9 +122,10 @@ class PetitionController:
             .all()
         )
 
-        label = ["petiton_id", "title", "agreed", "end_at"]
+        label = ["petition_id", "title", "agreed", "end_at"]
         petition_list = [
             {key: value for (key, value) in zip(label, row)} for row in get_list
         ]
         max_page = (len(petition_list) - 1) // 5 + 1
+
         return {"petitions": petition_list, "max_page": max_page}

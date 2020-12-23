@@ -25,16 +25,15 @@ def list_petitions(response: Response, status: str = "ongoing", page: int = 1):
 
 @petitions.get("/search", response_model=PetitionResponse.List)
 def search_petitons(q: str, page: int = 1):
-    # TODO 청원 검색 기능 구현
-    # TODO 사용자 입력값 검증
-    return "search"
+    return PetitionController.search_petitions(q=q, page=page)
 
 
 @petitions.post("", response_model=PetitionResponse.Id)
 def create_petition(
     req_form: Petition.Create, authorization: Optional[str] = Header(None)
 ):
-    # TODO 사용자의 입력값 검증
+    # XSS, 필터의 경우 리액트에서 적용함
+    # SQLI의 경우 Test 필요
     return PetitionController(**req_form.dict()).create()
 
 
