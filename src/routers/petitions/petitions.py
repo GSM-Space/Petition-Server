@@ -25,9 +25,7 @@ def list_petitions(response: Response, status: str = "ongoing", page: int = 1):
 
 @petitions.get("/search", response_model=PetitionResponse.List)
 def search_petitons(q: str, page: int = 1):
-    # TODO 청원 검색 기능 구현
-    # TODO 사용자 입력값 검증
-    return "search"
+    return PetitionController.search_petitions(q=q, page=page)
 
 
 @petitions.post("", response_model=PetitionResponse.Id)
