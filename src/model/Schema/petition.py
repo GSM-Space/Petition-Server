@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import List, Optional
 
+from model.Database.petitions import PetitionStatus
+
 
 class Petition:
     class Base(BaseModel):
@@ -16,8 +18,8 @@ class Petition:
             orm_mode = True
 
     class Preview(Base):
-        id: Optional[str]
-        status: int
+        petition_id: Optional[int]
+        status: PetitionStatus
         agreed: int
         end_at: datetime
 
