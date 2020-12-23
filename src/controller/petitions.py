@@ -64,7 +64,36 @@ class PetitionController:
         return 404
 
     def load(self):
-        return
+        con = db.session
+
+        petition = (
+            con.query(
+                Petitions.created_at,
+                Petitions.contents,
+                Petitions.end_at,
+                Petitions.title,
+                Petitions.status,
+                Petitions.proposal,
+                func.count("agreed").label("agreed"),
+                Petitions.petition_id,
+            )
+            .filter(Petitions.petition_id == self.id)
+            .first()
+        )
+
+        label = [
+            "created_at",
+            "contents",
+            "end_at",
+            "title",
+            "status",
+            "proposal",
+            "agreed",
+            "petition_id",
+        ]
+        petition_list = {key: value for (key, value) in zip(label, petition)}
+
+        return petition_list
 
     def delete(self):
         return

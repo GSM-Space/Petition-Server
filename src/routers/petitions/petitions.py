@@ -42,7 +42,7 @@ def create_petition(
 @petitions.get("/{id}", response_model=Petition.View)
 def load_petition(id: int):
     # TODO 200은 성공적 반환, 값이 없을 경우 404 반환
-    return "load"
+    return PetitionController(id=id).load()
 
 
 @petitions.delete("/{id}")
