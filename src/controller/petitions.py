@@ -52,16 +52,23 @@ class PetitionController:
         con.refresh(db_petition)
         return {"id": db_petition.petition_id}
 
-    def consent(self):
+    def consent(self, user_id):
         con = db.session
 
-        result = con.query(Agreements).filter(Agreements.petition_id == self.id).first()
-
+        result = (
+            con.query(Agreements)
+            .filter(Agreements.petition_id == self.id, Agreements.std_id == user_id)
+            .first()
+        )
         if result:
-            # 유저 아이디또한 존재하면 return 400
-            # 없다면 return 200
             return 400
-        return 404
+
+        agreement = Agreements(user_id, self.id)
+        con.add(agreement)
+        con.commit()
+        con.refresh(agreement)
+
+        return 200
 
     def load(self):
         con = db.session
