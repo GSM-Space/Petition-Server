@@ -36,18 +36,18 @@ class UserController:
             return {"error": "만료된 토큰입니다."}
         try:
             return {"information": {"email": check.email, "name": check.name}}
-        except Exception as e:
-            # 에러는 나올텐데, 무슨에러일지를 몰라서 우선적으로 에러 출력하게 Exception으로 적어놓았어요
-            print(e)
-            return register_user(self)
+        except AttributeError:
+            return UserController.register_user(self.data)
 
-    def register_user(self):
+    @staticmethod
+    def register_user(data):
+        con = db.session
         account = Users(
-            std_id=self.data["sub"],
-            email=self.data["email"],
-            name=self.data["name"],
+            std_id=data["sub"],
+            email=data["email"],
+            name=data["name"],
         )
         con.add(account)
         con.commit()
         con.refresh(account)
-        return {"information": {"email": self.data["email"], "name": self.data["name"]}}
+        return {"information": {"email": data["email"], "name": data["name"]}}

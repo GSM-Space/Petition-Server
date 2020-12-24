@@ -9,6 +9,6 @@ auth = APIRouter()
 
 @auth.post("/socialmedia")
 def socialmedia(authorization: Optional[str] = Header(None)):
-    user = UserController(authorization)
+    user = UserController(id_token=authorization)
     info = user.get_user_info()
     return info
