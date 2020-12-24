@@ -1,28 +1,53 @@
 import requests
 from fastapi_sqlalchemy import db
 
+from typing import List, Optional
+
 from model.Database.petitions import Petitions
-from model.Database.users import Users
+from model.Database.users import Users, Authority
+
 from controller.auth import auth_by_token
 
 
-def get_user_info(data):
-    con = db.session
-    try:
-        check = con.query(Users).filter(Users.std_id == data["sub"]).first()
-    except (KeyError):
-        return {"error": "만료된 토큰입니다."}
-    try:
-        return {"information": {"email": check.email, "name": check.name}}
-    except Exception as e:
-        # 에러는 나올텐데, 무슨에러일지를 몰라서 우선적으로 에러 출력하게 Exception으로 적어놓았어요
-        print(e)
-        return None
+class UserController:
+    def __init__(
+        self,
+        id: str = None,
+        email: str = None,
+        name: str = None,
+        authority: str = None,
+        my_petitions: Optional[List[Petitions]] = None,
+        agreed: int = None,
+        id_token: str = None,
+    ):
+        self.id = id
+        self.email = email
+        self.name = name
+        self.authority = authority
+        self.my_petitions = my_petitions
+        self.agreed = agreed
+        self.data = auth_by_token(id_token)
 
+    def get_user_info(self):
+        con = db.session
+        try:
+            check = con.query(Users).filter(Users.std_id == self.data["sub"]).first()
+        except (KeyError):
+            return {"error": "만료된 토큰입니다."}
+        try:
+            return {"information": {"email": check.email, "name": check.name}}
+        except AttributeError:
+            return UserController.register_user(self.data)
 
-def register_user(data):
-    account = Users(std_id=data["sub"], email=data["email"], name=data["name"])
-    con.add(account)
-    con.commit()
-    con.refresh(account)
-    return {"information": {"email": data["email"], "name": data["name"]}}
+    @staticmethod
+    def register_user(data):
+        con = db.session
+        account = Users(
+            std_id=data["sub"],
+            email=data["email"],
+            name=data["name"],
+        )
+        con.add(account)
+        con.commit()
+        con.refresh(account)
+        return {"information": {"email": data["email"], "name": data["name"]}}

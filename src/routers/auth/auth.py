@@ -1,19 +1,14 @@
 from fastapi import APIRouter, Header
 from typing import Optional
 
-from controller.users import get_user_info, register_user
-from controller.auth import auth_by_token
+from controller.users import UserController
+
 
 auth = APIRouter()
 
 
 @auth.post("/socialmedia")
 def socialmedia(authorization: Optional[str] = Header(None)):
-    data = auth_by_token(authorization)
-
-    info = None
-    if data:
-        info = get_user_info(data)
-    else:
-        info = register_user(data)
+    user = UserController(id_token=authorization)
+    info = user.get_user_info()
     return info
