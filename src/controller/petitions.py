@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.sql import func
 
 from model.Schema import Petition
-from model.Database import Petitions, Agreements
+from model.Database import Petitions, Agreements, PetitionStatus
 
 
 class PetitionController:
@@ -67,7 +67,22 @@ class PetitionController:
         return
 
     def delete(self):
-        return
+        con = db.session
+        petition = con.query(Petitions).filter(Petitions.petition_id == self.id).first()
+
+        try:
+            if petition.status == PetitionStatus.deleted:
+                res_status = 404
+            elif petition.petitioner == self.petitioner:
+                res_status = 204
+                petition.status = PetitionStatus.deleted
+                con.commit()
+            elif petition:
+                res_status = 403
+        except AttributeError:
+            res_status = 404
+
+        return res_status
 
     @staticmethod
     def count_petitions():
