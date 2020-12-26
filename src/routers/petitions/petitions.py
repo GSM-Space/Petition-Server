@@ -2,12 +2,22 @@ from fastapi import APIRouter, Response, Header
 from fastapi import status as res_status
 from typing import Optional
 
+from http import HTTPStatus
+
 from model.Schema import Petition, PetitionResponse
 
 from controller.petitions import PetitionController
+from controller.auth import auth_by_token
 
 
 petitions = APIRouter()
+status_dict = {
+    "200": res_status.HTTP_200_OK,
+    "204": res_status.HTTP_204_NO_CONTENT,
+    "400": res_status.HTTP_400_BAD_REQUEST,
+    "403": res_status.HTTP_403_FORBIDDEN,
+    "404": res_status.HTTP_404_NOT_FOUND,
+}
 
 
 @petitions.get("/count", response_model=PetitionResponse.Count)
@@ -18,7 +28,7 @@ def count_petition():
 @petitions.get("", status_code=200)
 def list_petitions(response: Response, status: str = "ongoing", page: int = 1):
     if not status in ["ongoing", "pending", "answered", "expired", "deleted"]:
-        response.status_code = res_status.HTTP_400_BAD_REQUEST
+        response.status_code = status_dict["404"]
         return {"description": "Invalid status value"}
     return PetitionController.get_petitions(status=status, page=page)
 
@@ -44,11 +54,16 @@ def load_petition(id: int):
 
 
 @petitions.delete("/{id}")
-def delete_petition(id: int, authorization: Optional[str] = Header(None)):
+def delete_petition(
+    id: int, response: Response, authorization: Optional[str] = Header(None)
+):
     # TODO 사용자 권한 인증
-    # 청원 삭제 기능 구현
+    # publisher = auth_by_token(authorization)["sub"]
+    status = PetitionController(id=id, petitioner="113799700035273671200").delete()
+    response.status_code = status_dict[str(status)]
+    if status == 204:
+        return Response(status_code=HTTPStatus.NO_CONTENT.value)
     # 204 -> 이미 삭제 된 청원, 403 -> 삭제 권한 없음, 404 -> 없는 청원
-    return "delete"
 
 
 @petitions.post("/{id}")
