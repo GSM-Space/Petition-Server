@@ -75,11 +75,6 @@ def agree_petition(
     result = PetitionController(id=id).consent(user_id)
 
     # 200 -> 성공, 400 -> 이미 동의한 청원, 404 -> 존재하지 않는 청원
-    if result == 200:
-        response.status_code = res_status.HTTP_200_OK
-    elif result == 400:
-        response.status_code = res_status.HTTP_400_BAD_REQUEST
-    elif result == 404:
-        response.status_code = res_status.HTTP_404_NOT_FOUND
+    response.status_code = status_dict[str(result)]
 
     return None
