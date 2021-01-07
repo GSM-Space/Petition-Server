@@ -15,8 +15,9 @@ def register_answers(
 
 
 @admin.put("answers/{id}")
+@check_admin
 def modify_answers(
     id: int, req_form: Answer, authorization: Optional[str] = Header(None)
 ):
-    # TODO 청원 답변 수정 기능 구현
-    return "answers"
+
+    PetitionController(id=id).modify_answers(req_form=req_form)

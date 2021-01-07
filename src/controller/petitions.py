@@ -2,8 +2,8 @@ from fastapi_sqlalchemy import db
 from datetime import datetime
 from sqlalchemy.sql import func
 
-from model.Schema import Petition
-from model.Database import Petitions, Agreements, PetitionStatus
+from model.Schema import Petition, Answer
+from model.Database import Petitions, Agreements, PetitionStatus, Answers
 
 
 class PetitionController:
@@ -173,3 +173,12 @@ class PetitionController:
         max_page = (len(petition_list) - 1) // 5 + 1
 
         return {"petitions": petition_list, "max_page": max_page}
+
+    def modify_answers(self, req_form: Answer):
+        con = db.session
+
+        answer = con.query(Answers).filter(Answers.petition_id == self.id).first()
+        answer.contents = req_form.contents
+        answer.answered_by = req_form.answered_by
+
+        con.commit()
