@@ -1,6 +1,8 @@
+from sqlalchemy import desc
 from fastapi_sqlalchemy import db
-from datetime import datetime
 from sqlalchemy.sql import func
+
+from datetime import datetime
 
 from model.Schema import Petition
 from model.Database import Petitions, Agreements, PetitionStatus
@@ -127,7 +129,6 @@ class PetitionController:
     def search_petitions(q: str, page: int):
         con = db.session
         min_limit = (page - 1) * 5
-
         searched = (
             con.query(
                 Petitions.petition_id.label("petition_id"),
@@ -138,22 +139,23 @@ class PetitionController:
             )
             .filter(Petitions.title.like(f"%{q}%"))
             .group_by(Petitions.petition_id)
-            .offset(min_limit)
-            .limit(5)
+            .order_by(desc(Petitions.petition_id))
             .all()
         )
-
         label = ["petition_id", "title", "agreed", "end_at", "status"]
         petition_list = [
             {key: value for (key, value) in zip(label, row)} for row in searched
         ]
-        max_page = (len(petition_list) - 1) // 5 + 1
-        return {"petitions": petition_list, "max_page": max_page}
+        max_page = ((len(petition_list) - 1) // 5) + 1
+        return {
+            "petitions": petition_list[min_limit : min_limit + 5],
+            "max_page": max_page,
+        }
 
     @staticmethod
     def get_petitions(status: str, page: int):
         con = db.session
-
+        min_limit = (page - 1) * 5
         get_list = (
             con.query(
                 Petitions.petition_id.label("petition_id"),
@@ -163,6 +165,7 @@ class PetitionController:
             )
             .filter(Petitions.status == status)
             .group_by(Petitions.petition_id)
+            .order_by(desc(Petitions.petition_id))
             .all()
         )
 
@@ -172,4 +175,7 @@ class PetitionController:
         ]
         max_page = (len(petition_list) - 1) // 5 + 1
 
-        return {"petitions": petition_list, "max_page": max_page}
+        return {
+            "petitions": petition_list[min_limit : min_limit + 5],
+            "max_page": max_page,
+        }
