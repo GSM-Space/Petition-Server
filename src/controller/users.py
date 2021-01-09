@@ -35,6 +35,7 @@ class UserController:
         except (KeyError):
             return {"error": "만료된 토큰입니다."}
         try:
+            self.id = check.std_id
             return {"information": {"email": check.email, "name": check.name}}
         except AttributeError:
             return UserController.register_user(self.data)
