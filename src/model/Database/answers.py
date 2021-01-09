@@ -17,6 +17,7 @@ class Answers(Base):
 
     petition = relationship("Petitions", back_populates="answer")
 
-    def __init__(self, petition_id, contents):
+    def __init__(self, petition_id, contents, answered_by):
         self.petition_id = petition_id
         self.contents = contents
+        self.answered_by = answered_by

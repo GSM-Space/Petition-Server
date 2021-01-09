@@ -175,7 +175,29 @@ class PetitionController:
         ]
         max_page = (len(petition_list) - 1) // 5 + 1
 
-        return {
-            "petitions": petition_list[min_limit : min_limit + 5],
-            "max_page": max_page,
-        }
+        return {"petitions": petition_list, "max_page": max_page}
+
+    def presence_petition(self) -> bool:
+        con = db.session
+
+        get_petition = (
+            con.query(Petitions)
+            .filter(Petitions.petition_id == self.petition_id)
+            .first()
+        )
+        return get_petition
+
+    def register_answers(self, req_form: Answer):
+        con = db.session
+
+        answer = Answers(
+            petition_id=self.id,
+            contents=req_form.contents,
+            answered_by=req_form.answered_by,
+        )
+
+        con = db.session
+        con.add(answer)
+        con.commit()
+        con.refresh(answer)
+        
