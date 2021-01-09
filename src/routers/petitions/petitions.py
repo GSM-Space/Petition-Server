@@ -34,7 +34,7 @@ def list_petitions(response: Response, status: str = "ongoing", page: int = 1):
 
 
 @petitions.get("/search", response_model=PetitionResponse.List)
-def search_petitons(q: str, page: int = 1):
+def search_petitons(q: str = "", page: int = 1):
     return PetitionController.search_petitions(q=q, page=page)
 
 
