@@ -4,7 +4,7 @@ from sqlalchemy.sql import func
 
 from datetime import datetime
 
-from model.Schema import Petition
+from model.Schema import Petition, Answer
 from model.Database import Petitions, Agreements, PetitionStatus
 
 
