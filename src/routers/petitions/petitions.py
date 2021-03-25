@@ -77,9 +77,12 @@ def agree_petition(
     id: int, response: Response, authorization: Optional[str] = Header(None)
 ):
     # TODO 사용자 권한 인증
+    user_con = UserController(id_token=authorization)
+    user_con.get_user_info()
+    user_id = user_con.id
+    result = PetitionController(id=id).consent(user_id)
+
     # 200 -> 성공, 400 -> 이미 동의한 청원, 404 -> 존재하지 않는 청원
-    status = PetitionController(id=id).consent()
+    response.status_code = status_dict[str(result)]
 
-    response.status_code = status_dict[str(status)]
-
-    return
+    return None

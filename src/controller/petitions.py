@@ -4,7 +4,7 @@ from sqlalchemy.sql import func
 
 from datetime import datetime
 
-from model.Schema import Petition
+from model.Schema import Petition, Answer
 from model.Database import Petitions, Agreements, PetitionStatus
 
 
@@ -54,16 +54,25 @@ class PetitionController:
         con.refresh(db_petition)
         return {"id": db_petition.petition_id}
 
-    def consent(self):
+    def consent(self, user_id):
         con = db.session
 
-        result = con.query(Agreements).filter(Agreements.petition_id == self.id).first()
-
-        if result:
-            # 유저 아이디또한 존재하면 return 400
-            # 없다면 return 200
+        result = (
+            con.query(Agreements)
+            .filter(Agreements.petition_id == self.id)
+            .first()
+        )
+        if not result:
+            return 404
+        elif result.std_id == user_id:
             return 400
-        return 404
+
+        agreement = Agreements(user_id, self.id)
+        con.add(agreement)
+        con.commit()
+        con.refresh(agreement)
+
+        return 200
 
     def load(self):
         con = db.session
