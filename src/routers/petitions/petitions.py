@@ -50,7 +50,13 @@ def create_petition(
 @petitions.get("/{id}", response_model=Petition.View)
 def load_petition(id: int):
     # TODO 200은 성공적 반환, 값이 없을 경우 404 반환
-    return PetitionController(id=id).load()
+    petitions = PetitionController(id=id).load()
+    if petitions:
+        response.status_code = status_dict["200"]
+    else:
+        response.status_code = status_dict["404"]
+
+    return petitions
 
 
 @petitions.delete("/{id}")
@@ -72,13 +78,8 @@ def agree_petition(
 ):
     # TODO 사용자 권한 인증
     # 200 -> 성공, 400 -> 이미 동의한 청원, 404 -> 존재하지 않는 청원
-    result = PetitionController(id=id).consent()
+    status = PetitionController(id=id).consent()
 
-    if result == 200:
-        response.status_code = res_status.HTTP_200_OK
-    elif result == 400:
-        response.status_code = res_status.HTTP_400_BAD_REQUEST
-    elif result == 404:
-        response.status_code = res_status.HTTP_404_NOT_FOUND
+    response.status_code = status_dict[str(status)]
 
-    return "dtd"
+    return
