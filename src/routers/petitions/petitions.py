@@ -65,11 +65,12 @@ def delete_petition(
 ):
     # TODO 사용자 권한 인증
     # publisher = auth_by_token(authorization)["sub"]
-    status = PetitionController(id=id, petitioner="113799700035273671200").delete()
-    response.status_code = status_dict[str(status)]
-    if status == 204:
-        return Response(status_code=HTTPStatus.NO_CONTENT.value)
+    petitioner = UserController(id_token=authorization).get_user_info().id
+    status = PetitionController(id=id, petitioner=petitioner).delete()
+
+    # 200 -> 성공
     # 204 -> 이미 삭제 된 청원, 403 -> 삭제 권한 없음, 404 -> 없는 청원
+    response.status_code = status_dict[str(status)]
 
 
 @petitions.post("/{id}")
