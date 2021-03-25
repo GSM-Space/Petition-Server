@@ -57,11 +57,7 @@ class PetitionController:
     def consent(self, user_id):
         con = db.session
 
-        result = (
-            con.query(Agreements)
-            .filter(Agreements.petition_id == self.id)
-            .first()
-        )
+        result = con.query(Agreements).filter(Agreements.petition_id == self.id).first()
         if not result:
             return 404
         elif result.std_id == user_id:
@@ -209,4 +205,3 @@ class PetitionController:
         con.add(answer)
         con.commit()
         con.refresh(answer)
-        
