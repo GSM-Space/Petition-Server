@@ -11,7 +11,7 @@ def main(argv: list() = sys.argv):
     """
 
     config = ConfigParser()
-    config.read("../config.ini")
+    config.read("config.ini")
 
     FILE_NAME = argv[0]
     reload: str = "False"
@@ -38,7 +38,7 @@ def main(argv: list() = sys.argv):
         elif opt in ("-P", "--PORT"):
             PORT: int = int(arg)
             # "PORT setting option : -P args, --PORT=args"
-    uvicorn.run("app:app", port=PORT, reload=reload)
+    uvicorn.run("app:app", host="0.0.0.0", port=PORT, reload=reload)
 
 
 if __name__ == "__main__":
