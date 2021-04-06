@@ -8,7 +8,7 @@ from model.Schema import Petition, PetitionResponse
 
 from controller.petitions import PetitionController
 from controller.auth import auth_by_token
-
+from controller.users import UserController
 
 petitions = APIRouter()
 status_dict = {
