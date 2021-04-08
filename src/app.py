@@ -9,17 +9,12 @@ from routers import api
 config = configparser.ConfigParser()
 config.read("config.ini")
 
-origins = [
-    "http://localhost",
-    "http://localhost:8080",
-]
-
 app = FastAPI()
 
 app.add_middleware(DBSession, db_url=config.get("default", "DB_URL"))
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],# TODO 추후 정확히 메서드 입력
     allow_headers=["*"],
