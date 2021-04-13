@@ -22,7 +22,8 @@ pip install -r requirements.txt
 
 4. 다음 명령어를 통해 프로그램을 실행시킵니다.
 ```sh
-python src/run_server.py -R -P 5225 # -R은 저장시 자동 실행 옵션이며, -P는 프로그램을 동작시킬 포트 번호이다. 공백시에 환경변수에 입력된 값으로 실행됩니다.
+python src/run_server.py -R -P 5225
+# -R은 저장시 자동 실행 옵션이며, -P는 프로그램을 동작시킬 포트 번호이다. 공백시에 환경변수에 입력된 값으로 실행됩니다.
 ```
 
 5. 다음으로 요청을 보내, 서버가 잘 작동하는지 확인을 한다.
@@ -32,6 +33,6 @@ python src/run_server.py -R -P 5225 # -R은 저장시 자동 실행 옵션이며
 ### /config.ini
 ```ini
 [default]
-DB_URL = "mysql://{your mysql account name}:{your mysql account password}@localhost:{your mysql use port number}/{GSM_space database name}?charset=utf8"
+DB_URL = "mysql://{account name}:{account password}@localhost:{using port number}/{DB name}?charset=utf8"
 PORT = "you will write youn want port number"
 ```
