@@ -30,6 +30,8 @@ python src/run_server.py -R -P 5225
 
 > POST /api/test
 
+## 환경 변수
+
 ### /config.ini
 ```ini
 [default]
