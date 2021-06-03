@@ -1,14 +1,15 @@
 from fastapi import APIRouter, Response, Header
 from fastapi import status as res_status
+from fastapi.param_functions import Depends
 from typing import Optional
 
-from http import HTTPStatus
 
 from model.Schema import Petition, PetitionResponse
+from model.Schema.user import User
 
 from controller.petitions import PetitionController
-from controller.auth import auth_by_token
 from controller.users import UserController
+from controller.auth import auth_user
 
 petitions = APIRouter()
 status_dict = {
@@ -39,12 +40,10 @@ def search_petitons(q: str = "", page: int = 1):
 
 
 @petitions.post("", response_model=PetitionResponse.Id)
-def create_petition(
-    req_form: Petition.Create, authorization: Optional[str] = Header(None)
-):
-    # XSS, 필터의 경우 리액트에서 적용함
-    # SQLI의 경우 Test 필요
-    return PetitionController(**req_form.dict()).create()
+def create_petition(req_form: Petition.Create, current_user: User = Depends(auth_user)):
+    petition = req_form.dict()
+    petition.update(petitioner=current_user.id)
+    return PetitionController(**petition).create()
 
 
 @petitions.get("/{id}", response_model=Petition.View)
