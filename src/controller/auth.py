@@ -46,16 +46,23 @@ class AuthController:
 
 def auth_user(authorization: str = Header(None)):
     if not authorization:
-        raise HTTPException(401, detail="로그인을 해주세요")
+        return None
 
     try:
         user_id = AuthController.decode_token(authorization)
     except JWTError:
-        raise HTTPException(401, detail="다시 로그인 해주세요")
+        return None
 
     user = UserController().get_user(user_id)
 
-    if not user:
+    return user
+
+
+def login_required(authorization: str = Header(None)):
+    if not authorization:
         raise HTTPException(401, detail="로그인을 해주세요")
 
-    return user
+    user = auth_user(authorization)
+
+    if user is None:
+        raise HTTPException(401, detail="로그인을 해주세요")

@@ -9,55 +9,25 @@ from model.Database import Petitions, Agreements, PetitionStatus
 
 
 class PetitionController:
-    def __init__(
-        self,
-        id: int = None,
-        status: int = None,
-        petitioner: int = None,
-        title: str = None,
-        contents: str = None,
-        proposal: str = None,
-        agreed: int = None,
-        created_at: datetime = None,
-        end_at: datetime = None,
-        agreeable: bool = None,
-        answer: str = None,
-        answered_at: datetime = None,
-        answered_by: str = None,
-    ):
-        self.id = id
-        self.status = status
-        self.petitioner = petitioner
-        self.title = title
-        self.contents = contents
-        self.proposal = proposal
-        self.agreed = agreed
-        self.created_at = created_at
-        self.end_at = end_at
-        self.agreeable = agreeable
-        self.answer = answer
-        self.answered_at = answered_at
-        self.answered_by = answered_by
+    def __init__(self):
+        pass
 
-    def create(self):
-        data = Petition.Create(
-            title=self.title,
-            contents=self.contents,
-            proposal=self.proposal,
-            petitioner=self.petitioner,
-        )
+    @staticmethod
+    def create(data: Petition.Create):
         db_petition = Petitions(**data.dict())
-
         con = db.session
         con.add(db_petition)
         con.commit()
         con.refresh(db_petition)
         return {"id": db_petition.petition_id}
 
-    def consent(self, user_id):
+    @staticmethod
+    def consent(petition_id, user_id):
         con = db.session
 
-        result = con.query(Petitions).filter(Petitions.petition_id == self.id).first()
+        result = (
+            con.query(Petitions).filter(Petitions.petition_id == petition_id).first()
+        )
         if not result:
             return 404
         elif con.query(Agreements).filter(Agreements.petition_id == self.id).first():
@@ -70,37 +40,35 @@ class PetitionController:
 
         return 200
 
-    def load(self):
+    @staticmethod
+    def load(id: int):
         con = db.session
 
-        petition = (
-            con.query(
-                Petitions.created_at,
-                Petitions.contents,
-                Petitions.end_at,
-                Petitions.title,
-                Petitions.status,
-                Petitions.proposal,
-                func.count("agreed").label("agreed"),
-                Petitions.petition_id,
-            )
-            .filter(Petitions.petition_id == self.id)
+        result = (
+            con.query(Petitions, func.count("agreed").label("agreed"))
+            .filter(Petitions.petition_id == id)
             .first()
         )
 
-        label = [
-            "created_at",
-            "contents",
-            "end_at",
-            "title",
-            "status",
-            "proposal",
-            "agreed",
-            "petition_id",
-        ]
-        petition_list = {key: value for (key, value) in zip(label, petition)}
+        if result[0] is None:
+            return None
 
-        return petition_list
+        petition = Petition.View(**result[0].__dict__, agreed=result[1])
+
+        return petition
+
+    @staticmethod
+    def is_agreed(petition_id: int, user_id: int):
+        con = db.session
+
+        result = (
+            con.query(Agreements)
+            .filter(Agreements.petition_id == petition_id)
+            .filter(Agreements.std_id == user_id)
+            .first()
+        )
+
+        return bool(result)
 
     def delete(self):
         con = db.session

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response, Header
+from fastapi import APIRouter, Response, Header, HTTPException
 from fastapi import status as res_status
 from fastapi.param_functions import Depends
 from typing import Optional
@@ -9,7 +9,7 @@ from model.Schema.user import User
 
 from controller.petitions import PetitionController
 from controller.users import UserController
-from controller.auth import auth_user
+from controller.auth import auth_user, login_required
 
 petitions = APIRouter()
 status_dict = {
@@ -27,10 +27,9 @@ def count_petition():
 
 
 @petitions.get("", status_code=200)
-def list_petitions(response: Response, status: str = "ongoing", page: int = 1):
-    if not status in ["ongoing", "pending", "answered", "expired", "deleted"]:
-        response.status_code = status_dict["404"]
-        return {"description": "Invalid status value"}
+def list_petitions(status: str = "ongoing", page: int = 1):
+    if not status in ["ongoing", "pending", "answered", "expired"]:
+        raise HTTPException(400, "Bad Request")
     return PetitionController.get_petitions(status=status, page=page)
 
 
@@ -40,22 +39,24 @@ def search_petitons(q: str = "", page: int = 1):
 
 
 @petitions.post("", response_model=PetitionResponse.Id)
-def create_petition(req_form: Petition.Create, current_user: User = Depends(auth_user)):
+def create_petition(
+    req_form: Petition.Create, current_user: User = Depends(login_required)
+):
     petition = req_form.dict()
     petition.update(petitioner=current_user.id)
     return PetitionController(**petition).create()
 
 
 @petitions.get("/{id}", response_model=Petition.View)
-def load_petition(id: int):
-    # TODO 200은 성공적 반환, 값이 없을 경우 404 반환
-    petitions = PetitionController(id=id).load()
-    if petitions:
-        response.status_code = status_dict["200"]
-    else:
-        response.status_code = status_dict["404"]
+def load_petition(id: int, current_user: User = Depends(auth_user)):
+    petition: Petition.View = PetitionController.load(id=id)
+    if petition is None:
+        raise HTTPException(404, "Not Found")
 
-    return petitions
+    if current_user:
+        petition.agreeable = not PetitionController.is_agreed(id, current_user.id)
+
+    return petition
 
 
 @petitions.delete("/{id}")

@@ -27,7 +27,7 @@ class Petition:
         created_at: datetime
         contents: str
         proposal: str
-        agreeable: Optional[bool]
+        agreeable: Optional[bool] = False
         answer: Optional[str]
         answered_at: Optional[datetime]
         answered_by: Optional[str]
