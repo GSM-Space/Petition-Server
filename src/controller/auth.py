@@ -65,3 +65,5 @@ def login_required(authorization: str = Header(None)):
 
     if user is None:
         raise HTTPException(401, detail="로그인을 해주세요")
+
+    return user
