@@ -54,7 +54,8 @@ def load_petition(id: int, current_user: User = Depends(auth_user)):
         raise HTTPException(404, "Not Found")
 
     if current_user:
-        petition.agreeable = not PetitionController.is_agreed(id, current_user.id)
+        agreed = PetitionController.is_agreed(id, current_user.id)
+        petition.agreeable = "agreed" if agreed else "not_agreed"
 
     return petition
 
