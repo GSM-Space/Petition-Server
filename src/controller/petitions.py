@@ -23,23 +23,30 @@ class PetitionController:
         return {"id": db_petition.petition_id}
 
     @staticmethod
-    def consent(petition_id, user_id):
+    def consent(id: int, user: User):
         con = db.session
 
-        result = (
-            con.query(Petitions).filter(Petitions.petition_id == petition_id).first()
-        )
-        if not result:
-            return 404
-        elif con.query(Agreements).filter(Agreements.petition_id == self.id).first():
-            return 400
+        result = con.query(Petitions).filter(Petitions.petition_id == id).first()
 
-        agreement = Agreements(user_id, self.id)
+        if not result:
+            return None
+
+        if result.status == PetitionStatus.deleted:
+            return None
+
+        if (
+            con.query(Agreements)
+            .filter(Agreements.petition_id == id and Agreements.std_id == user.id)
+            .first()
+        ):
+            return True
+
+        agreement = Agreements(user.id, id)
         con.add(agreement)
         con.commit()
         con.refresh(agreement)
 
-        return 200
+        return True
 
     @staticmethod
     def load(id: int, user: User):
