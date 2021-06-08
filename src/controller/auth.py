@@ -39,9 +39,7 @@ class AuthController:
     @staticmethod
     def decode_token(token: str):
         payload = jwt.decode(token, JWT_SECRET, algorithms=JWT_ALGORITHM)
-        sub = payload.get("sub")
-
-        return sub
+        return payload
 
 
 def auth_user(authorization: str = Header(None)):
@@ -49,11 +47,12 @@ def auth_user(authorization: str = Header(None)):
         return None
 
     try:
-        user_id = AuthController.decode_token(authorization)
+        payload = AuthController.decode_token(authorization)
+        user_email = payload.get("sub", None)
     except JWTError:
         return None
 
-    user = UserController().get_user(user_id)
+    user = UserController().get_user(email=user_email)
 
     return user
 
