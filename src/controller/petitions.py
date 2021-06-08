@@ -3,8 +3,9 @@ from fastapi_sqlalchemy import db
 from sqlalchemy.sql import func
 
 from datetime import datetime
+from model.Database.users import Authority
 
-from model.Schema import Petition, Answer
+from model.Schema import Petition, Answer, User
 from model.Database import Petitions, Agreements, PetitionStatus
 
 
@@ -41,7 +42,7 @@ class PetitionController:
         return 200
 
     @staticmethod
-    def load(id: int):
+    def load(id: int, user: User):
         con = db.session
 
         result = (
@@ -49,6 +50,11 @@ class PetitionController:
             .filter(Petitions.petition_id == id)
             .first()
         )
+
+        if result[0].status == PetitionStatus.deleted and (
+            user is None or user.authority != Authority.admin
+        ):
+            return None
 
         if result[0] is None:
             return None
@@ -58,35 +64,35 @@ class PetitionController:
         return petition
 
     @staticmethod
-    def is_agreed(petition_id: int, user_id: int):
+    def is_agreed(petition_id: int, user: User):
         con = db.session
 
         result = (
             con.query(Agreements)
             .filter(Agreements.petition_id == petition_id)
-            .filter(Agreements.std_id == user_id)
+            .filter(Agreements.std_id == user.id)
             .first()
         )
 
         return bool(result)
 
-    def delete(self):
+    @staticmethod
+    def delete(petition_id: int, user: User):
         con = db.session
-        petition = con.query(Petitions).filter(Petitions.petition_id == self.id).first()
+        petition = (
+            con.query(Petitions).filter(Petitions.petition_id == petition_id).first()
+        )
 
-        try:
-            if petition.status == PetitionStatus.deleted:
-                res_status = 404
-            elif petition.petitioner == self.petitioner:
-                res_status = 204
-                petition.status = PetitionStatus.deleted
-                con.commit()
-            elif petition:
-                res_status = 403
-        except AttributeError:
-            res_status = 404
+        if petition.status == PetitionStatus.deleted:
+            return None
 
-        return res_status
+        if petition.petitioner != user.id:
+            return petition
+
+        petition.status = PetitionStatus.deleted
+        con.commit()
+
+        return petition
 
     @staticmethod
     def count_petitions():

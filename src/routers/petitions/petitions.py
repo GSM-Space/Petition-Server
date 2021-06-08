@@ -2,6 +2,7 @@ from fastapi import APIRouter, Response, Header, HTTPException
 from fastapi import status as res_status
 from fastapi.param_functions import Depends
 from typing import Optional
+from model.Database.petitions import PetitionStatus
 
 
 from model.Schema import Petition, PetitionResponse
@@ -49,29 +50,27 @@ def create_petition(
 
 @petitions.get("/{id}", response_model=Petition.View)
 def load_petition(id: int, current_user: User = Depends(auth_user)):
-    petition: Petition.View = PetitionController.load(id=id)
+    petition: Petition.View = PetitionController.load(id=id, user=current_user)
     if petition is None:
         raise HTTPException(404, "Not Found")
 
     if current_user:
-        agreed = PetitionController.is_agreed(id, current_user.id)
+        agreed = PetitionController.is_agreed(id, current_user)
         petition.agreeable = "agreed" if agreed else "not_agreed"
 
     return petition
 
 
-@petitions.delete("/{id}")
-def delete_petition(
-    id: int, response: Response, authorization: Optional[str] = Header(None)
-):
-    # TODO 사용자 권한 인증
-    # publisher = auth_by_token(authorization)["sub"]
-    petitioner = UserController(id_token=authorization).get_user_info().id
-    status = PetitionController(id=id, petitioner=petitioner).delete()
+@petitions.delete("/{id}", status_code=204)
+def delete_petition(id: int, current_user: User = Depends(login_required)):
+    petition = PetitionController.delete(id, current_user)
 
-    # 200 -> 성공
-    # 204 -> 이미 삭제 된 청원, 403 -> 삭제 권한 없음, 404 -> 없는 청원
-    response.status_code = status_dict[str(status)]
+    if petition is None:
+        raise HTTPException(404, "Not Found")
+    if petition.status != PetitionStatus.deleted:
+        raise HTTPException(403, "Forbidden")
+
+    return Response(status_code=204)
 
 
 @petitions.post("/{id}")
