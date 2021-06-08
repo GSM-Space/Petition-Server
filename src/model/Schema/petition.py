@@ -1,3 +1,4 @@
+from enum import Enum
 from pydantic import BaseModel
 from datetime import datetime
 from typing import List, Optional
@@ -5,12 +6,18 @@ from typing import List, Optional
 from model.Database.petitions import PetitionStatus
 
 
+class Agreeable(Enum):
+    login_required = "login_required"
+    not_agreed = "not_agreed"
+    agreed = "agreed"
+
+
 class Petition:
     class Base(BaseModel):
         title: str
 
     class Create(Base):
-        petitioner: str
+        petitioner: Optional[str]
         contents: str
         proposal: str
 
@@ -27,7 +34,7 @@ class Petition:
         created_at: datetime
         contents: str
         proposal: str
-        agreeable: Optional[bool]
+        agreeable: Optional[Agreeable] = "login_required"
         answer: Optional[str]
         answered_at: Optional[datetime]
         answered_by: Optional[str]

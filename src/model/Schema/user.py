@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from typing import List
 
+from model.Database.users import Authority
+
 
 class Account:
     """
@@ -10,3 +12,10 @@ class Account:
 
     name: str
     consent: List[str]
+
+
+class User(BaseModel):
+    id: str
+    email: str
+    name: str
+    authority: Authority

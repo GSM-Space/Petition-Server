@@ -1,124 +1,108 @@
+from typing import List
 from sqlalchemy import desc
 from fastapi_sqlalchemy import db
 from sqlalchemy.sql import func
 
 from datetime import datetime
+from model.Database.users import Authority
 
-from model.Schema import Petition, Answer
-from model.Database import Petitions, Agreements, PetitionStatus
+from model.Schema import Petition, Answer, User
+from model.Database import Petitions, Agreements, PetitionStatus, petitions
 
 
 class PetitionController:
-    def __init__(
-        self,
-        id: int = None,
-        status: int = None,
-        petitioner: int = None,
-        title: str = None,
-        contents: str = None,
-        proposal: str = None,
-        agreed: int = None,
-        created_at: datetime = None,
-        end_at: datetime = None,
-        agreeable: bool = None,
-        answer: str = None,
-        answered_at: datetime = None,
-        answered_by: str = None,
-    ):
-        self.id = id
-        self.status = status
-        self.petitioner = petitioner
-        self.title = title
-        self.contents = contents
-        self.proposal = proposal
-        self.agreed = agreed
-        self.created_at = created_at
-        self.end_at = end_at
-        self.agreeable = agreeable
-        self.answer = answer
-        self.answered_at = answered_at
-        self.answered_by = answered_by
+    def __init__(self):
+        pass
 
-    def create(self):
-        data = Petition.Create(
-            title=self.title,
-            contents=self.contents,
-            proposal=self.proposal,
-            petitioner=self.petitioner,
-        )
+    @staticmethod
+    def create(data: Petition.Create):
         db_petition = Petitions(**data.dict())
-
         con = db.session
         con.add(db_petition)
         con.commit()
         con.refresh(db_petition)
         return {"id": db_petition.petition_id}
 
-    def consent(self, user_id):
+    @staticmethod
+    def consent(id: int, user: User):
         con = db.session
 
-        result = con.query(Petitions).filter(Petitions.petition_id == self.id).first()
-        if not result:
-            return 404
-        elif con.query(Agreements).filter(Agreements.petition_id == self.id).first():
-            return 400
+        result = con.query(Petitions).filter(Petitions.petition_id == id).first()
 
-        agreement = Agreements(user_id, self.id)
+        if not result:
+            return None
+
+        if result.status == PetitionStatus.deleted:
+            return None
+
+        if (
+            con.query(Agreements)
+            .filter(Agreements.petition_id == id and Agreements.std_id == user.id)
+            .first()
+        ):
+            return True
+
+        agreement = Agreements(user.id, id)
         con.add(agreement)
         con.commit()
         con.refresh(agreement)
 
-        return 200
+        return True
 
-    def load(self):
+    @staticmethod
+    def load(id: int, user: User):
         con = db.session
 
-        petition = (
+        result = (
             con.query(
-                Petitions.created_at,
-                Petitions.contents,
-                Petitions.end_at,
-                Petitions.title,
-                Petitions.status,
-                Petitions.proposal,
-                func.count("agreed").label("agreed"),
-                Petitions.petition_id,
+                Petitions, func.count(Agreements.petition_id == Petitions.petition_id)
             )
-            .filter(Petitions.petition_id == self.id)
+            .filter(Petitions.petition_id == id)
             .first()
         )
 
-        label = [
-            "created_at",
-            "contents",
-            "end_at",
-            "title",
-            "status",
-            "proposal",
-            "agreed",
-            "petition_id",
-        ]
-        petition_list = {key: value for (key, value) in zip(label, petition)}
+        if result[0].status == PetitionStatus.deleted and (
+            user is None or user.authority != Authority.admin
+        ):
+            return None
 
-        return petition_list
+        if result[0] is None:
+            return None
 
-    def delete(self):
+        petition = Petition.View(**result[0].__dict__, agreed=result[1])
+
+        return petition
+
+    @staticmethod
+    def is_agreed(petition_id: int, user: User):
         con = db.session
-        petition = con.query(Petitions).filter(Petitions.petition_id == self.id).first()
 
-        try:
-            if petition.status == PetitionStatus.deleted:
-                res_status = 404
-            elif petition.petitioner == self.petitioner:
-                res_status = 204
-                petition.status = PetitionStatus.deleted
-                con.commit()
-            elif petition:
-                res_status = 403
-        except AttributeError:
-            res_status = 404
+        result = (
+            con.query(Agreements)
+            .filter(Agreements.petition_id == petition_id)
+            .filter(Agreements.std_id == user.id)
+            .first()
+        )
 
-        return res_status
+        return bool(result)
+
+    @staticmethod
+    def delete(petition_id: int, user: User):
+        con = db.session
+        petition = (
+            con.query(Petitions).filter(Petitions.petition_id == petition_id).first()
+        )
+
+        if petition.status == PetitionStatus.deleted:
+            return None
+
+        if petition.petitioner != user.id:
+            return petition
+
+        petition.status = PetitionStatus.deleted
+        con.commit()
+
+        return petition
 
     @staticmethod
     def count_petitions():
@@ -160,25 +144,22 @@ class PetitionController:
     @staticmethod
     def get_petitions(status: str, page: int):
         con = db.session
-        min_limit = (page - 1) * 5
-        get_list = (
-            con.query(
-                Petitions.petition_id.label("petition_id"),
-                Petitions.title.label("title"),
-                func.count("agreed").label("agreed"),
-                Petitions.end_at.label("end_at"),
-            )
+        result = (
+            con.query(Petitions, func.count(Agreements.petition_id))
+            .outerjoin(Agreements)
             .filter(Petitions.status == status)
             .group_by(Petitions.petition_id)
             .order_by(desc(Petitions.petition_id))
+            .limit(5)
+            .offset((page - 1) * 5)
             .all()
         )
-
-        label = ["petition_id", "title", "agreed", "end_at"]
-        petition_list = [
-            {key: value for (key, value) in zip(label, row)} for row in get_list
+        max_page = (
+            con.query(Petitions).filter(Petitions.status == status).count() - 1
+        ) // 5 + 1
+        petition_list: List[Petition.Preview] = [
+            Petition.Preview(**item[0].__dict__, agreed=item[1]) for item in result
         ]
-        max_page = (len(petition_list) - 1) // 5 + 1
 
         return {"petitions": petition_list, "max_page": max_page}
 
