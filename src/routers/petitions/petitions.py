@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Response, HTTPException
-from fastapi import status as res_status
 from fastapi.param_functions import Depends
 from model.Database.petitions import PetitionStatus
 
@@ -8,7 +7,6 @@ from model.Schema import Petition, PetitionResponse
 from model.Schema.user import User
 
 from controller.petitions import PetitionController
-from controller.users import UserController
 from controller.auth import auth_user, login_required
 
 petitions = APIRouter()
@@ -35,9 +33,10 @@ def search_petitons(q: str = "", page: int = 1):
 def create_petition(
     req_form: Petition.Create, current_user: User = Depends(login_required)
 ):
+    req_form.petitioner = current_user.id
     petition = req_form.dict()
     petition.update(petitioner=current_user.id)
-    return PetitionController(**petition).create()
+    return PetitionController.create(req_form)
 
 
 @petitions.get("/{id}", response_model=Petition.View)

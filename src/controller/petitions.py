@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy import desc
 from fastapi_sqlalchemy import db
 from sqlalchemy.sql import func
@@ -6,7 +7,7 @@ from datetime import datetime
 from model.Database.users import Authority
 
 from model.Schema import Petition, Answer, User
-from model.Database import Petitions, Agreements, PetitionStatus
+from model.Database import Petitions, Agreements, PetitionStatus, petitions
 
 
 class PetitionController:
@@ -53,7 +54,9 @@ class PetitionController:
         con = db.session
 
         result = (
-            con.query(Petitions, func.count("agreed").label("agreed"))
+            con.query(
+                Petitions, func.count(Agreements.petition_id == Petitions.petition_id)
+            )
             .filter(Petitions.petition_id == id)
             .first()
         )
@@ -141,25 +144,22 @@ class PetitionController:
     @staticmethod
     def get_petitions(status: str, page: int):
         con = db.session
-        min_limit = (page - 1) * 5
-        get_list = (
-            con.query(
-                Petitions.petition_id.label("petition_id"),
-                Petitions.title.label("title"),
-                func.count("agreed").label("agreed"),
-                Petitions.end_at.label("end_at"),
-            )
+        result = (
+            con.query(Petitions, func.count(Agreements.petition_id))
+            .outerjoin(Agreements)
             .filter(Petitions.status == status)
             .group_by(Petitions.petition_id)
             .order_by(desc(Petitions.petition_id))
+            .limit(5)
+            .offset((page - 1) * 5)
             .all()
         )
-
-        label = ["petition_id", "title", "agreed", "end_at"]
-        petition_list = [
-            {key: value for (key, value) in zip(label, row)} for row in get_list
+        max_page = (
+            con.query(Petitions).filter(Petitions.status == status).count() - 1
+        ) // 5 + 1
+        petition_list: List[Petition.Preview] = [
+            Petition.Preview(**item[0].__dict__, agreed=item[1]) for item in result
         ]
-        max_page = (len(petition_list) - 1) // 5 + 1
 
         return {"petitions": petition_list, "max_page": max_page}
 
